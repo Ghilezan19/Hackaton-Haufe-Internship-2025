@@ -15,7 +15,39 @@ export async function authenticate(
   try {
     const authHeader = req.headers.authorization;
 
+    // Development mode: Allow requests without auth from VS Code extension
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      // Check if request is from localhost (VS Code extension)
+      const isLocalhost = req.ip === '127.0.0.1' || 
+                         req.ip === '::1' || 
+                         req.hostname === 'localhost';
+      
+      if (isLocalhost && process.env.NODE_ENV !== 'production') {
+        // Create/use a test user for VS Code extension
+        let testUser = await User.findOne({ email: 'vscode-extension@test.local' });
+        
+        if (!testUser) {
+          // Create test user with unlimited reviews
+          testUser = await User.create({
+            name: 'VS Code Extension',
+            email: 'vscode-extension@test.local',
+            password: 'test123', // Won't be used for login
+            role: 'admin', // Admin = unlimited reviews
+            subscription: {
+              plan: 'enterprise',
+              reviewsUsed: 0,
+              totalReviewsAllowed: -1,
+              reviewsLeft: -1
+            }
+          });
+        }
+        
+        req.user = testUser;
+        req.userId = testUser._id.toString();
+        next();
+        return;
+      }
+      
       res.status(401).json({ error: 'No token provided' });
       return;
     }

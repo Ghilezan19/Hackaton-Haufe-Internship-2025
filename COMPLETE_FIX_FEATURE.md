@@ -273,3 +273,4 @@ Frontend rulează pe: `http://localhost:8081`
 
 **STATUS: ✅ FULLY FUNCTIONAL!**
 
+

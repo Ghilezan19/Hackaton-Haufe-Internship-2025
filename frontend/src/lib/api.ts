@@ -320,5 +320,27 @@ export const api = {
     const data = await response.json();
     return data.fixedCode;
   },
+
+  async verifyExercise(request: { exerciseId: string; code: string; language: string }): Promise<any> {
+    const response = await fetch(`${API_BASE_URL}/exercises/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      if (response.status === 401) {
+        removeAuthToken();
+        throw new Error('Please login to continue');
+      }
+      throw new Error(error.message || error.error || 'Exercise verification failed');
+    }
+
+    return response.json();
+  },
 };
 

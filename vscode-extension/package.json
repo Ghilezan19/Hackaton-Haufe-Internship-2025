@@ -1,143 +1,104 @@
 {
-  "name": "lintora",
+  "name": "lintora-code-review",
   "displayName": "Lintora - AI Code Review",
-  "description": "AI-powered code review with local LLM. Get instant feedback on security, quality, and performance.",
+  "description": "AI-powered code review before every git commit using local LLM",
   "version": "1.0.0",
   "publisher": "lintora",
-  "icon": "icon.svg",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.80.0"
   },
   "categories": [
     "Linters",
-    "Programming Languages",
     "Other"
   ],
   "keywords": [
     "code review",
     "ai",
-    "linter",
-    "security",
-    "quality",
-    "ollama",
-    "llm"
+    "llm",
+    "git",
+    "commit",
+    "pre-commit",
+    "linter"
   ],
   "activationEvents": [
-    "onCommand:lintora.reviewFile",
-    "onCommand:lintora.reviewSelection",
-    "onCommand:lintora.reviewWorkspace",
-    "onCommand:lintora.fixCode"
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "lintora.reviewFile",
-        "title": "Lintora: Review Current File",
-        "icon": "$(search)"
+        "command": "lintora.reviewCurrentFile",
+        "title": "Lintora: Review Current File"
       },
       {
-        "command": "lintora.reviewSelection",
-        "title": "Lintora: Review Selected Code",
-        "icon": "$(search-view-icon)"
+        "command": "lintora.reviewChangedFiles",
+        "title": "Lintora: Review Changed Files"
       },
       {
-        "command": "lintora.reviewWorkspace",
-        "title": "Lintora: Review All Files",
-        "icon": "$(folder)"
+        "command": "lintora.fixAllIssues",
+        "title": "Lintora: Fix All Issues",
+        "icon": "$(wrench)"
       },
       {
-        "command": "lintora.fixCode",
-        "title": "Lintora: Fix Code Issues",
-        "icon": "$(wand)"
+        "command": "lintora.enablePreCommitReview",
+        "title": "Lintora: Enable Pre-Commit Review"
       },
       {
-        "command": "lintora.configure",
-        "title": "Lintora: Configure Settings",
-        "icon": "$(gear)"
+        "command": "lintora.disablePreCommitReview",
+        "title": "Lintora: Disable Pre-Commit Review"
+      },
+      {
+        "command": "lintora.preCommitCheck",
+        "title": "Lintora: Pre-Commit Check"
       }
     ],
-    "menus": {
-      "editor/context": [
-        {
-          "command": "lintora.reviewSelection",
-          "group": "lintora@1",
-          "when": "editorHasSelection"
-        },
-        {
-          "command": "lintora.reviewFile",
-          "group": "lintora@2"
-        },
-        {
-          "command": "lintora.fixCode",
-          "group": "lintora@3"
-        }
-      ],
-      "explorer/context": [
-        {
-          "command": "lintora.reviewFile",
-          "group": "lintora@1"
-        }
-      ]
-    },
     "configuration": {
-      "title": "Lintora",
+      "title": "Lintora Code Review",
       "properties": {
         "lintora.apiUrl": {
           "type": "string",
           "default": "http://localhost:3000/api",
-          "description": "Lintora backend API URL"
+          "description": "Lintora API URL"
         },
         "lintora.authToken": {
           "type": "string",
           "default": "",
-          "description": "Authentication token (JWT)"
+          "description": "Authentication token for Lintora API"
         },
-        "lintora.analysisTypes": {
-          "type": "array",
-          "default": ["security", "quality", "performance"],
-          "description": "Types of analysis to perform",
-          "items": {
-            "type": "string",
-            "enum": ["security", "quality", "performance", "architecture", "testing", "documentation"]
-          }
-        },
-        "lintora.autoReview": {
+        "lintora.enablePreCommit": {
           "type": "boolean",
           "default": false,
-          "description": "Automatically review files on save"
+          "description": "Enable automatic code review before git commit"
         },
-        "lintora.showInlineDecorations": {
+        "lintora.blockCommitOnCritical": {
           "type": "boolean",
           "default": true,
-          "description": "Show inline decorations for issues"
+          "description": "Block commit if critical severity issues found"
         },
-        "lintora.severity": {
-          "type": "string",
-          "default": "high",
-          "enum": ["critical", "high", "medium", "low", "info"],
-          "description": "Minimum severity level to show"
+        "lintora.blockCommitOnHigh": {
+          "type": "boolean",
+          "default": false,
+          "description": "Block commit if high severity issues found"
         }
       }
     },
-    "viewsContainers": {
-      "activitybar": [
+    "menus": {
+      "scm/title": [
         {
-          "id": "lintora",
-          "title": "Lintora",
-          "icon": "$(search-view-icon)"
+          "command": "lintora.reviewChangedFiles",
+          "group": "navigation",
+          "when": "scmProvider == git"
         }
-      ]
-    },
-    "views": {
-      "lintora": [
+      ],
+      "editor/context": [
         {
-          "id": "lintoraFindings",
-          "name": "Code Review Findings"
+          "command": "lintora.reviewCurrentFile",
+          "group": "lintora@1"
         },
         {
-          "id": "lintoraStats",
-          "name": "Statistics"
+          "command": "lintora.fixAllIssues",
+          "group": "lintora@2"
         }
       ]
     }
@@ -146,22 +107,16 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package",
-    "publish": "vsce publish"
+    "package": "vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/vscode": "^1.80.0",
-    "@vscode/vsce": "^2.22.0",
-    "typescript": "^5.3.0"
+    "typescript": "^5.0.0",
+    "@vscode/vsce": "^2.19.0"
   },
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Ghilezan19/test.git"
-  },
-  "license": "MIT"
+    "axios": "^1.6.0"
+  }
 }
 

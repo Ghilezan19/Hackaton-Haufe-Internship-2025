@@ -1,7 +1,7 @@
 import { Ollama } from 'ollama';
 
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://localhost:11434';
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'codellama:13b';
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'llama2:3b';
 
 export const ollama = new Ollama({ host: OLLAMA_HOST });
 
@@ -99,4 +99,5 @@ export async function chatWithOllama(
     throw new Error(`Failed to chat: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
 

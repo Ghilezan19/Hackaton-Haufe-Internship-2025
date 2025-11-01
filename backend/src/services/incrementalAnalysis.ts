@@ -175,3 +175,4 @@ function calculateIncrementalScore(findings: Finding[]): number {
   return Math.max(0, 100 - Math.min(totalPenalty, 100));
 }
 
+

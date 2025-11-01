@@ -1,4 +1,4 @@
-import { generateWithOpenAI } from './openai.js';
+import { generateWithLLM } from '../lib/localLLM.js';
 import { 
   AnalysisType, 
   Finding, 
@@ -244,25 +244,25 @@ export async function analyzeCode(
     'documentation'
   ];
 
-  // OPTIMIZED: Single combined request for SPEED with ACCURATE Romanian explanations
+  // OPTIMIZED: Single combined request for SPEED with ACCURATE English explanations
   try {
-    const systemPrompt = `Ești un expert code reviewer. 
+    const systemPrompt = `You are an expert code reviewer. 
 
 IMPORTANT:
-1. Citește codul CU ATENȚIE și verifică ce EXISTĂ deja înainte să spui că lipsește
-2. Găsește doar PROBLEME REALE, nu inventa
-3. Dacă codul e corect, SPUNE că e corect, nu inventa probleme
-4. Folosește română simplă
+1. Read the code CAREFULLY and verify what ALREADY EXISTS before saying something is missing
+2. Find only REAL PROBLEMS, don't invent issues
+3. If the code is correct, SAY it's correct, don't invent problems
+4. Use simple English
 
-Exemple de ce să NU faci:
-❌ "Lipsește #include" când există deja în cod
-❌ "Nu ai return" când există return 0;
-❌ Probleme inventate
+Examples of what NOT to do:
+❌ "Missing #include" when it already exists in code
+❌ "No return statement" when there's return 0;
+❌ Invented problems
 
-Exemple bune:
-✅ "Ai pus = în loc de =="
-✅ "Variabila x nu e inițializată"
-✅ "Lipsește ; la sfârșitul liniei"`;
+Good examples:
+✅ "Used = instead of =="
+✅ "Variable x is not initialized"
+✅ "Missing ; at end of line"`;
 
     // Add line numbers to code for accurate references
     const codeLines = request.code.split('\n');
@@ -270,23 +270,23 @@ Exemple bune:
       .map((line, index) => `${index + 1}| ${line}`)
       .join('\n');
 
-    const userPrompt = `Analizează ATENT codul ${request.language || ''} (max 3 probleme REALE):
+    const userPrompt = `Analyze CAREFULLY this ${request.language || ''} code (max 3 REAL problems):
 
-Codul cu numere de linie (FOLOSEȘTE ACESTE NUMERE EXACTE):
+Code with line numbers (USE THESE EXACT NUMBERS):
 \`\`\`${request.language || ''}
 ${numberedCode}
 \`\`\`
 
-VERIFICĂ CODUL și găsește doar probleme REALE:
-## [Problema REALĂ]
-Line: [numărul EXACT din stânga, ex: 5]
+CHECK THE CODE and find only REAL problems:
+## [REAL Problem]
+Line: [EXACT number from left, e.g.: 5]
 Severity: critical/high/medium/low
-Problem: [ce E GREȘIT - 1 propoziție]
-Fix: [cum să rezolve - 1 propoziție]
+Problem: [what's WRONG - 1 sentence]
+Fix: [how to solve it - 1 sentence]
 
-IMPORTANT: Folosește numerele de linie din stânga (1|, 2|, 3|, etc.)!`;
+IMPORTANT: Use the line numbers from the left (1|, 2|, 3|, etc.)!`;
 
-    const result = await generateWithOpenAI(userPrompt, systemPrompt);
+    const result = await generateWithLLM(userPrompt, systemPrompt);
     totalTokens += result.tokensUsed;
     
     // Parse findings (will work with all types)
@@ -365,7 +365,7 @@ ${code}
 Provide ONLY the fixed code snippet without explanation.
 `;
 
-  const result = await generateWithOpenAI(
+  const result = await generateWithLLM(
     prompt,
     'You are a code fixing expert. Provide only corrected code.'
   );

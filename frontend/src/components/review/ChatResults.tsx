@@ -31,12 +31,6 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
   // Build all messages
   const messages: Message[] = [];
 
-  // User message
-  messages.push({
-    type: "user",
-    content: "Analizează codul ăsta 👆",
-  });
-
   // AI Overview message - Per total cum e codul
   const totalIssues = results.summary.totalFindings;
   const criticalCount = results.summary.critical + results.summary.high;
@@ -44,13 +38,13 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
   
   let overviewMessage = "";
   if (totalIssues === 0) {
-    overviewMessage = "🎉 Codul arată foarte bine! Nu am găsit probleme. Scor: 100/100";
+    overviewMessage = "🎉 Code looks great! No issues found. Score: 100/100";
   } else if (score >= 80) {
-    overviewMessage = `📊 Overview: Codul e în general bun (scor ${score}/100), dar am găsit ${totalIssues} lucruri de îmbunătățit${criticalCount > 0 ? `, dintre care ${criticalCount} sunt importante` : ''}.`;
+    overviewMessage = `📊 Overview: Code is generally good (score ${score}/100), but found ${totalIssues} things to improve${criticalCount > 0 ? `, including ${criticalCount} critical ones` : ''}.`;
   } else if (score >= 60) {
-    overviewMessage = `📊 Overview: Codul funcționează (scor ${score}/100), dar are ${totalIssues} probleme${criticalCount > 0 ? `, inclusiv ${criticalCount} critice` : ''} care trebuie rezolvate.`;
+    overviewMessage = `📊 Overview: Code works (score ${score}/100), but has ${totalIssues} issues${criticalCount > 0 ? `, including ${criticalCount} critical` : ''} that need fixing.`;
   } else {
-    overviewMessage = `⚠️ Overview: Codul are probleme serioase (scor ${score}/100). Am găsit ${totalIssues} probleme, dintre care ${criticalCount} sunt critice. Trebuie corectat!`;
+    overviewMessage = `⚠️ Overview: Code has serious problems (score ${score}/100). Found ${totalIssues} issues, ${criticalCount} of them critical. Needs fixing!`;
   }
 
   messages.push({
@@ -62,7 +56,7 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
   if (totalIssues > 0) {
     messages.push({
       type: "ai", 
-      content: "Hai să vedem fiecare problemă:",
+      content: "Let's review each issue:",
     });
   }
 
@@ -84,13 +78,10 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
     const icon = finding.severity === "critical" || finding.severity === "high" ? "🔴" : 
                  finding.severity === "medium" ? "🟡" : "🔵";
     
-    // SUPER SIMPLU - ca și cum vorbești cu un prieten
-    const lineInfo = finding.lineStart ? `Linia ${finding.lineStart}` : "Cod";
+    const lineInfo = finding.lineStart ? `Line ${finding.lineStart}` : "Code";
     
-    // Simplificare extremă a mesajului
     let simpleMessage = `${icon} ${lineInfo}: ${finding.description}`;
     
-    // Adaugă fix-ul într-o propoziție simplă
     if (finding.recommendation) {
       simpleMessage += `\n\n💡 ${finding.recommendation}`;
     }
@@ -102,16 +93,67 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
     });
   });
 
-  // Summary message (score already declared at the top)
+  // Detailed Summary - Final Report
+  if (totalIssues > 0) {
+    messages.push({
+      type: "ai",
+      content: "📋 **Summary Report:**",
+    });
+
+    // Create detailed summary by category
+    let detailedSummary = `**Total Issues Found: ${totalIssues}**\n\n`;
+    
+    if (criticalFindings.length > 0) {
+      detailedSummary += `🔴 **Critical/High Severity:** ${criticalFindings.length + highFindings.length} issues\n`;
+      detailedSummary += criticalFindings.concat(highFindings).map((f, i) => 
+        `   ${i + 1}. ${f.title || f.description.split('.')[0]} (Line ${f.lineStart || 'N/A'})`
+      ).join('\n') + '\n\n';
+    }
+    
+    if (mediumFindings.length > 0) {
+      detailedSummary += `🟡 **Medium Severity:** ${mediumFindings.length} issues\n`;
+      detailedSummary += mediumFindings.slice(0, 3).map((f, i) => 
+        `   ${i + 1}. ${f.title || f.description.split('.')[0]}`
+      ).join('\n');
+      if (mediumFindings.length > 3) {
+        detailedSummary += `\n   ... and ${mediumFindings.length - 3} more`;
+      }
+      detailedSummary += '\n\n';
+    }
+    
+    if (lowFindings.length > 0) {
+      detailedSummary += `🔵 **Low/Info:** ${lowFindings.length} suggestions\n\n`;
+    }
+
+    // Analysis types summary
+    const typeGroups = results.findings.reduce((acc, f) => {
+      acc[f.type] = (acc[f.type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    detailedSummary += `**Issues by Category:**\n`;
+    Object.entries(typeGroups).forEach(([type, count]) => {
+      const icon = type === 'security' ? '🛡️' : type === 'performance' ? '⚡' : 
+                   type === 'quality' ? '✨' : type === 'testing' ? '🧪' : '📝';
+      detailedSummary += `${icon} ${type.charAt(0).toUpperCase() + type.slice(1)}: ${count}\n`;
+    });
+
+    messages.push({
+      type: "ai",
+      content: detailedSummary,
+    });
+  }
+
+  // Final Score Message
   let summaryMessage = "";
   if (score >= 90) {
-    summaryMessage = `🌟 **Scor final: ${score}/100** - Cod excelent! Doar câteva optimizări minore.`;
+    summaryMessage = `🌟 **Final Score: ${score}/100** - Excellent code! Just minor optimizations needed.`;
   } else if (score >= 70) {
-    summaryMessage = `✅ **Scor final: ${score}/100** - Cod bun! Cu câteva îmbunătățiri va fi perfect.`;
+    summaryMessage = `✅ **Final Score: ${score}/100** - Good code! A few improvements will make it perfect.`;
   } else if (score >= 50) {
-    summaryMessage = `⚠️ **Scor final: ${score}/100** - Necesită îmbunătățiri. Rezolvă problemele critice.`;
+    summaryMessage = `⚠️ **Final Score: ${score}/100** - Needs improvements. Fix critical issues first.`;
   } else {
-    summaryMessage = `🚨 **Scor final: ${score}/100** - Necesită atenție urgentă! Multe probleme de rezolvat.`;
+    summaryMessage = `🚨 **Final Score: ${score}/100** - Needs urgent attention! Prioritize critical issues.`;
   }
 
   messages.push({
@@ -123,7 +165,7 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
   if (results.suggestions.refactoring && results.suggestions.refactoring.length > 0) {
     messages.push({
       type: "ai",
-      content: "💡 **Sfatul meu:** " + results.suggestions.refactoring[0],
+      content: "💡 **My Recommendations:**\n" + results.suggestions.refactoring.slice(0, 3).map((s, i) => `${i + 1}. ${s}`).join('\n'),
     });
   }
 
@@ -152,7 +194,7 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
     if (!code || !onFixCode) return;
     
     setIsGeneratingFix(true);
-    toast.loading("Generez codul corect...", { id: "fix-code" });
+    toast.loading("Generating fixed code...", { id: "fix-code" });
     
     try {
       // Generate complete fixed code using GPT
@@ -167,10 +209,10 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
         onCorrectedLines(correctedLines);
       }
       
-      toast.success("Cod corectat! 🎉", { id: "fix-code" });
+      toast.success("Code fixed! 🎉", { id: "fix-code" });
     } catch (error) {
       console.error("Error fixing code:", error);
-      toast.error("Eroare la corectare. Încearcă din nou.", { id: "fix-code" });
+      toast.error("Fix error. Try again.", { id: "fix-code" });
     } finally {
       setIsGeneratingFix(false);
     }
@@ -247,7 +289,7 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
         className="flex justify-center"
       >
         <div className="text-xs text-muted-foreground bg-muted/30 rounded-full px-4 py-2">
-          ⚡ Analizat în {(results.metrics.analysisTime / 1000).toFixed(1)}s • {results.metrics.tokensUsed.toLocaleString()} tokens
+          ⚡ Analyzed in {(results.metrics.analysisTime / 1000).toFixed(1)}s • {results.metrics.tokensUsed.toLocaleString()} tokens
         </div>
       </motion.div>
 
@@ -273,12 +315,12 @@ export const ChatResults = ({ results, code, language, onFixCode, onErrorLines, 
                 >
                   <Wand2 className="h-5 w-5" />
                 </motion.div>
-                Generez codul corect...
+                Generating fix...
               </>
             ) : (
               <>
                 <Wand2 className="h-5 w-5" />
-                Dorești corectarea codului?
+                Fix all issues?
               </>
             )}
           </Button>

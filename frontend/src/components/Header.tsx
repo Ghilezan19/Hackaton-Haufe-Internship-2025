@@ -99,6 +99,16 @@ export const Header = () => {
             <Button 
               variant="ghost" 
               className="relative group"
+              onClick={() => navigate('/exercises')}
+            >
+              Exercises
+              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+            <Button 
+              variant="ghost" 
+              className="relative group"
               onClick={() => navigate('/pricing')}
             >
               Pricing

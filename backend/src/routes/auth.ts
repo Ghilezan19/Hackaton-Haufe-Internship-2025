@@ -13,3 +13,4 @@ authRouter.post('/admin/create', createAdmin); // Protected by admin secret
 authRouter.get('/profile', authenticate, getProfile);
 authRouter.post('/upgrade', authenticate, upgradePlan);
 
+

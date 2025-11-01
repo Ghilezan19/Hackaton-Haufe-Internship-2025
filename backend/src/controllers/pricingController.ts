@@ -5,3 +5,4 @@ export async function getPricingPlans(req: Request, res: Response): Promise<void
   res.json({ plans: PRICING_PLANS });
 }
 
+

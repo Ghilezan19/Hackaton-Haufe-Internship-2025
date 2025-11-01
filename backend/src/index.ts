@@ -5,6 +5,7 @@ import { reviewRouter } from './routes/review.js';
 import { healthRouter } from './routes/health.js';
 import { authRouter } from './routes/auth.js';
 import { pricingRouter } from './routes/pricing.js';
+import exercisesRouter from './routes/exercises.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { connectDatabase } from './config/database.js';
 
@@ -12,7 +13,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:8080';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:8085';
 
 // Connect to MongoDB
 connectDatabase();
@@ -27,6 +28,7 @@ app.use('/api/health', healthRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/pricing', pricingRouter);
 app.use('/api/review', reviewRouter);
+app.use('/api/exercises', exercisesRouter);
 
 // Error handling
 app.use(errorHandler);

@@ -353,3 +353,4 @@ Lintora is a **complete, production-ready code review assistant** that demonstra
 
 **Made with ❤️ for the Haufe Hackathon**
 
+

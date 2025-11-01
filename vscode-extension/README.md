@@ -1,220 +1,259 @@
-# Lintora - AI Code Review for VS Code
+# Lintora - AI Code Review Extension
 
-AI-powered code review directly in your editor! Get instant feedback on security, quality, and performance using local LLM technology.
+![Lintora Logo](icon.png)
 
-## ✨ Features
+**AI-powered code review before every git commit using local LLM**
 
-- 🔍 **Instant Code Review** - Analyze your code with one click
-- 🤖 **AI-Powered** - Uses local LLM (Ollama) or OpenAI GPT
-- 🔒 **Privacy-First** - Your code stays local (when using Ollama)
-- 🎯 **Smart Analysis** - Security, Quality, Performance, Architecture
-- ✨ **Auto-Fix** - Automatically fix detected issues
-- 📊 **Real-time Stats** - Track code quality metrics
-- 🎨 **Inline Decorations** - See issues directly in your code
-- 💡 **Hover Details** - Get detailed explanations
+## 🎯 Features
 
-## 🚀 Quick Start
+- ✅ **Automatic Pre-Commit Review** - Reviews staged files before every commit
+- ✅ **Real-time Diagnostics** - Shows issues directly in VS Code Problems panel
+- ✅ **Manual Review** - Review current file or all changed files on demand
+- ✅ **Block Commits** - Optionally prevent commits with critical issues
+- ✅ **Multi-language Support** - JavaScript, TypeScript, Python, Java, C++, and more
+- ✅ **Local LLM** - Uses Lintora backend (Ollama + GPT)
 
-### 1. Install Extension
+## 📸 Screenshots
 
-1. Download the `.vsix` file
-2. Open VS Code
-3. Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac)
-4. Type: `Extensions: Install from VSIX`
-5. Select the downloaded `.vsix` file
+### Code Review in Action
+![Review Results](screenshots/review.png)
 
-### 2. Start Backend
+### Problems Panel
+![Problems Panel](screenshots/problems.png)
 
+### Git Integration
+![Git Integration](screenshots/git.png)
+
+## 🚀 Installation
+
+### Prerequisites
+
+1. **Lintora Backend** must be running on `http://localhost:3000`
+2. **VS Code** 1.80.0 or higher
+3. **Git** installed and repository initialized
+
+### Install Extension
+
+#### Option 1: From VSIX (Local Install)
 ```bash
-cd backend
+cd vscode-extension
 npm install
-npm run dev
+npm run compile
+npm run package
+code --install-extension lintora-code-review-1.0.0.vsix
 ```
 
-Backend runs on `http://localhost:3000`
+#### Option 2: From Source
+```bash
+cd vscode-extension
+npm install
+npm run compile
+```
 
-### 3. Use Extension!
-
-- **Review Current File**: `Ctrl+Shift+P` → `Lintora: Review Current File`
-- **Review Selection**: Select code → Right-click → `Lintora: Review Selected Code`
-- **Auto-Fix**: `Ctrl+Shift+P` → `Lintora: Fix Code Issues`
-
-## 📋 Commands
-
-| Command | Description | Shortcut |
-|---------|-------------|----------|
-| `Lintora: Review Current File` | Analyze open file | - |
-| `Lintora: Review Selected Code` | Analyze selection only | - |
-| `Lintora: Review All Files` | Analyze entire workspace | - |
-| `Lintora: Fix Code Issues` | Auto-fix detected problems | - |
-| `Lintora: Configure Settings` | Open settings | - |
+Then press `F5` in VS Code to launch Extension Development Host.
 
 ## ⚙️ Configuration
 
-Configure Lintora in VS Code settings (`Ctrl+,`):
+Open VS Code Settings (`Ctrl+,`) and search for "Lintora":
+
+### Settings
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `lintora.apiUrl` | `http://localhost:3000/api` | Lintora API URL |
+| `lintora.authToken` | `""` | Authentication token (JWT) |
+| `lintora.enablePreCommit` | `true` | Enable automatic pre-commit review |
+| `lintora.blockCommitOnErrors` | `false` | Block commit on critical/high issues |
+| `lintora.minSeverityToBlock` | `"high"` | Minimum severity to block commit |
+
+### Example Configuration
 
 ```json
 {
   "lintora.apiUrl": "http://localhost:3000/api",
-  "lintora.authToken": "",
-  "lintora.analysisTypes": ["security", "quality", "performance"],
-  "lintora.autoReview": false,
-  "lintora.showInlineDecorations": true,
-  "lintora.severity": "high"
+  "lintora.authToken": "your-jwt-token-here",
+  "lintora.enablePreCommit": true,
+  "lintora.blockCommitOnErrors": true,
+  "lintora.minSeverityToBlock": "high"
 }
 ```
 
-### Settings Explained
+## 🎮 Usage
 
-- **apiUrl**: Backend API endpoint
-- **authToken**: JWT token for authentication (if required)
-- **analysisTypes**: Types of analysis to run
-  - `security` - SQL injection, XSS, etc.
-  - `quality` - Code smells, best practices
-  - `performance` - Optimization issues
-  - `architecture` - Design patterns
-  - `testing` - Missing tests
-  - `documentation` - Missing docs
-- **autoReview**: Auto-review files on save
-- **showInlineDecorations**: Show colored highlights in editor
-- **severity**: Minimum severity to show (critical/high/medium/low/info)
+### Automatic Pre-Commit Review
 
-## 🎨 UI Features
+1. Stage your changes (`git add`)
+2. Start typing commit message
+3. Extension **automatically** reviews staged files
+4. Issues appear in **Problems panel**
+5. Commit proceeds (or blocked if configured)
 
-### Sidebar Panel
+### Manual Commands
 
-Open the Lintora sidebar (`Ctrl+Shift+E` → Lintora icon) to see:
+Press `Ctrl+Shift+P` and type:
 
-1. **Code Review Findings**
-   - Grouped by severity
-   - Click to jump to line
-   - Expandable details
+- **`Lintora: Review Current File`** - Review currently open file
+- **`Lintora: Review Changed Files`** - Review all staged files
+- **`Lintora: Enable Pre-Commit Review`** - Enable automatic review
+- **`Lintora: Disable Pre-Commit Review`** - Disable automatic review
 
-2. **Statistics**
-   - Overall score
-   - Issue counts by severity
-   - Quality indicators
+### Right-Click Menu
 
-### Inline Decorations
+- Right-click in editor → **"Lintora: Review Current File"**
+- Click icon in Source Control panel → **"Lintora: Review Changed Files"**
 
-Issues are highlighted directly in your code:
-- 🔴 **Red** - Critical issues (SQL injection, secrets, etc.)
-- 🟡 **Orange** - High severity (validation, security risks)
-- 🟠 **Yellow** - Medium severity (code quality)
-- 🔵 **Blue** - Low severity (minor improvements)
+## 📊 Understanding Results
 
-### Hover for Details
+### Severity Levels
 
-Hover over highlighted code to see:
-- Issue title
-- Detailed description
-- Recommended fix
-- Severity level
+- 🔴 **Critical** - Security vulnerabilities, severe bugs
+- 🟠 **High** - Important issues affecting functionality
+- 🟡 **Medium** - Code quality issues
+- 🔵 **Low** - Minor improvements
+- ℹ️ **Info** - Suggestions
 
-## 🧪 Example Workflow
+### Problems Panel
 
-1. **Write code** in any supported language
-2. **Save file** (or run `Review Current File`)
-3. **See issues** highlighted in editor
-4. **Hover** for details and recommendations
-5. **Click** "Fix Code Issues" for auto-fix
-6. **Review** proposed changes
-7. **Apply** fixes with one click!
+All issues appear in the **Problems** panel with:
+- File location and line number
+- Issue title and description
+- Recommendation for fixing
 
-## 🎯 Supported Languages
+### Output Channel
 
-- JavaScript / TypeScript
-- Python
-- Java
-- C / C++
-- C#
-- PHP
-- Ruby
-- Go
-- Rust
-- Swift
-- Kotlin
-- Scala
+Detailed logs in **Output** → **Lintora**
 
-## 🔧 Troubleshooting
+## 🔧 How It Works
 
-### "Backend not running"
-
-**Solution**: Start the backend server:
-```bash
-cd backend
-npm run dev
+```
+┌─────────────────────────────────────┐
+│  1. You stage files (git add)      │
+├─────────────────────────────────────┤
+│  2. You type commit message         │
+├─────────────────────────────────────┤
+│  3. Extension detects commit        │
+├─────────────────────────────────────┤
+│  4. Sends code to Lintora API       │
+├─────────────────────────────────────┤
+│  5. AI analyzes code (2-3 seconds)  │
+├─────────────────────────────────────┤
+│  6. Results shown in Problems panel │
+├─────────────────────────────────────┤
+│  7. Commit proceeds (or blocked)    │
+└─────────────────────────────────────┘
 ```
 
-### "Authentication required"
+## 🛠️ Development
 
-**Solution**: Set your JWT token:
+### Build
+
+```bash
+npm install
+npm run compile
+```
+
+### Watch Mode
+
+```bash
+npm run watch
+```
+
+### Package
+
+```bash
+npm run package
+```
+
+### Debug
+
+1. Open `vscode-extension` folder in VS Code
+2. Press `F5` to launch Extension Development Host
+3. Test extension in new window
+
+## 🎯 Configuration Examples
+
+### Basic Setup (Review Only)
 ```json
 {
-  "lintora.authToken": "your_jwt_token_here"
+  "lintora.enablePreCommit": true,
+  "lintora.blockCommitOnErrors": false
+}
+```
+→ Reviews code but **allows commit** regardless of issues
+
+### Strict Mode (Block Bad Commits)
+```json
+{
+  "lintora.enablePreCommit": true,
+  "lintora.blockCommitOnErrors": true,
+  "lintora.minSeverityToBlock": "high"
+}
+```
+→ **Blocks commit** if critical or high severity issues found
+
+### Manual Only (No Auto-Review)
+```json
+{
+  "lintora.enablePreCommit": false
+}
+```
+→ Only manual reviews via commands
+
+## 🔑 Authentication
+
+If your Lintora backend requires authentication:
+
+1. Login to Lintora web app
+2. Copy JWT token from browser (LocalStorage: `lintora_token`)
+3. Add to VS Code settings:
+```json
+{
+  "lintora.authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
-Or login via the web app first.
+## 🐛 Troubleshooting
 
-### "No issues found" (but there should be)
+### "Failed to connect to Lintora API"
 
-**Solution**: Check backend logs and ensure OpenAI API key is set:
-```bash
-# In backend/.env
-OPENAI_API_KEY=your_key_here
-```
+**Solution:**
+- Ensure backend is running on `http://localhost:3000`
+- Check `lintora.apiUrl` setting
+- Verify auth token if required
 
-### Extension not appearing
+### "No issues found but I see errors"
 
-**Solution**: Reload VS Code:
-- Press `Ctrl+Shift+P`
-- Type: `Reload Window`
+**Solution:**
+- Only reviews **staged files** (git add)
+- Check file is supported language
+- Review manually: `Ctrl+Shift+P` → "Lintora: Review Current File"
 
-## 📊 Performance
+### "Extension not activating"
 
-- **Fast Analysis**: 2-5 seconds per file
-- **Lightweight**: Minimal memory usage
-- **Smart Caching**: Reuses results when possible
-- **Async**: Doesn't block your workflow
+**Solution:**
+- Reload VS Code: `Ctrl+Shift+P` → "Reload Window"
+- Check Output → Lintora for errors
+- Verify VS Code version >= 1.80.0
 
-## 🔒 Privacy & Security
+## 📚 Supported Languages
 
-### Local Mode (Ollama)
-- ✅ Code never leaves your machine
-- ✅ No external API calls
-- ✅ Full privacy
+JavaScript, TypeScript, Python, Java, C, C++, C#, PHP, Ruby, Go, Rust
 
-### Cloud Mode (OpenAI)
-- ⚠️ Code sent to OpenAI API
-- ✅ Secure HTTPS connection
-- ✅ No data retention by Lintora
+## 🤝 Contributing
 
-## 🎁 Additional Features
-
-- **Auto-review on save** - Optional continuous analysis
-- **Workspace-wide review** - Analyze all files at once
-- **Context menu integration** - Right-click for quick actions
-- **Status bar indicator** - Quick access to review
-- **Keyboard shortcuts** - Fast workflow
-
-## 📖 More Information
-
-- **GitHub**: https://github.com/Ghilezan19/test
-- **Documentation**: See repository README
-- **Issues**: Report bugs on GitHub
+This is part of the Lintora Hackathon project. Issues and PRs welcome!
 
 ## 📄 License
 
-MIT License - See LICENSE file
+MIT
 
 ## 🙏 Credits
 
-- Built with ❤️ for better code quality
-- Powered by Ollama & OpenAI
-- Created for Haufe Hackathon
+- Built for **Haufe Hackathon**
+- Powered by **Lintora AI** + **Ollama** + **GPT**
 
 ---
 
-**Happy Coding! 🚀**
+**Made with ❤️ by Team Lintora**
+
 

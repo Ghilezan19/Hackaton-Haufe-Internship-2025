@@ -242,3 +242,4 @@ Your Lintora app now has:
 
 **Start coding and reviewing! 🚀**
 
+

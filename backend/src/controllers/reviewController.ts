@@ -177,33 +177,33 @@ export async function generateCompleteFixHandler(req: Request, res: Response) {
 
     console.log(`✨ Generating complete fixed code for ${findings.length} issues...`);
     
-    // Generate complete fixed code using OpenAI
-    const { generateWithOpenAI } = await import('../services/openai.js');
+    // Generate complete fixed code using local LLM
+    const { generateWithLLM } = await import('../lib/localLLM.js');
     
-    const systemPrompt = `Ești un expert programator. Trebuie să corectezi TOATE problemele din cod și să returnezi codul COMPLET și CORECT.
+    const systemPrompt = `You are an expert programmer. You must fix ALL problems in the code and return the COMPLETE and CORRECT code.
 
 IMPORTANT:
-- Returnează DOAR CODUL, fără explicații
-- Păstrează formatarea și indentarea
-- Corectează TOATE problemele menționate
-- Nu adăuga comentarii extra`;
+- Return ONLY THE CODE, without explanations
+- Keep formatting and indentation
+- Fix ALL mentioned problems
+- Don't add extra comments`;
 
     const issuesList = findings.map((f: any, i: number) => 
-      `${i + 1}. Linia ${f.lineStart || '?'}: ${f.description || f.title}`
+      `${i + 1}. Line ${f.lineStart || '?'}: ${f.description || f.title}`
     ).join('\n');
 
-    const userPrompt = `Corectează următoarele probleme în codul ${language}:
+    const userPrompt = `Fix the following problems in the ${language} code:
 
 ${issuesList}
 
-Cod original:
+Original code:
 \`\`\`${language}
 ${code}
 \`\`\`
 
-Returnează codul COMPLET și CORECT (doar cod, fără markdown):`;
+Return the COMPLETE and CORRECT code (code only, no markdown):`;
 
-    const result = await generateWithOpenAI(userPrompt, systemPrompt);
+    const result = await generateWithLLM(userPrompt, systemPrompt);
     
     // Clean up the response - remove markdown if present
     let fixedCode = result.response.trim();

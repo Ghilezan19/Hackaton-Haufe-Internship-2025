@@ -139,3 +139,4 @@ trap "echo ''; echo '🛑 Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 
 
 wait
 
+

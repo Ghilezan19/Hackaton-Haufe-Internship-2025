@@ -5,3 +5,4 @@ export const pricingRouter = Router();
 
 pricingRouter.get('/', getPricingPlans);
 
+

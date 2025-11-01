@@ -256,7 +256,7 @@ const Review = () => {
                       onFixCode={(fixedCode) => {
                         setCode(fixedCode);
                         setIsCorrected(true); // Mark code as corrected
-                        toast.success("Codul a fost corectat în editor! 🎉");
+                        toast.success("Code has been fixed in the editor! 🎉");
                       }}
                     />
                   </div>

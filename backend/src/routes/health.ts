@@ -1,18 +1,18 @@
 import { Router } from 'express';
-import { checkOpenAIConnection } from '../services/openai.js';
+import { checkLLMConnection } from '../lib/localLLM.js';
 
 export const healthRouter = Router();
 
 healthRouter.get('/', async (req, res) => {
   try {
-    // Check OpenAI but report as "Ollama" for appearance
-    const aiStatus = await checkOpenAIConnection();
+    // Check LLM connection
+    const aiStatus = await checkLLMConnection();
     
     // Make it look like Ollama
     const ollamaStatus = {
       connected: aiStatus.connected,
-      model: 'codellama:7b', // Report as local model
-      host: 'http://localhost:11434', // Report as local
+      model: aiStatus.model, // Report the model from .env (llama3.2)
+      host: process.env.OLLAMA_HOST || 'http://localhost:11434',
       error: aiStatus.error
     };
     
