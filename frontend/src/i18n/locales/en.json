@@ -1,0 +1,62 @@
+{
+  "header": {
+    "title": "Lintora",
+    "features": "Features",
+    "pricing": "Pricing",
+    "startReview": "Start Review",
+    "home": "Home",
+    "review": "Review Code"
+  },
+  "hero": {
+    "badge": "AI-Powered Code Analysis",
+    "title": "Ship Better Code,",
+    "titleLine2": "Review Faster",
+    "subtitle": "Advanced AI code review assistant that detects issues, suggests improvements, and helps your team maintain high-quality code standards.",
+    "startFreeReview": "Start Free Review",
+    "viewDemo": "View Demo"
+  },
+  "stats": {
+    "reviewsCompleted": "Reviews Completed",
+    "issuesDetected": "Issues Detected",
+    "timeSaved": "Time Saved"
+  },
+  "features": {
+    "title": "Comprehensive Code Analysis",
+    "security": {
+      "title": "Security Analysis",
+      "description": "Detect vulnerabilities, injection risks, and security anti-patterns automatically."
+    },
+    "quality": {
+      "title": "Code Quality",
+      "description": "Analyze readability, maintainability, and adherence to best practices."
+    },
+    "performance": {
+      "title": "Performance",
+      "description": "Identify bottlenecks, memory leaks, and optimization opportunities."
+    },
+    "architecture": {
+      "title": "Architecture Review",
+      "description": "Assess design patterns, coupling, and overall code structure."
+    },
+    "testing": {
+      "title": "Test Coverage",
+      "description": "Suggest missing tests and identify untested critical paths."
+    },
+    "fixes": {
+      "title": "Quick Fixes",
+      "description": "Get AI-generated patches and suggestions to fix issues instantly."
+    }
+  },
+  "cta": {
+    "title": "Ready to Improve Your Code Quality?",
+    "subtitle": "Start your first review in seconds. No credit card required.",
+    "button": "Start Free Review"
+  },
+  "footer": {
+    "copyright": "© 2024 Lintora. Built with ❤️ for developers."
+  },
+  "review": {
+    "title": "Code Review",
+    "subtitle": "AI-powered code analysis using local LLM for privacy and performance"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "header": {
+    "title": "Lintora",
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "startReview": "Démarrer la Revue"
+  },
+  "hero": {
+    "badge": "Analyse de Code par IA",
+    "title": "Livrez un Meilleur Code,",
+    "titleLine2": "Révisez Plus Rapidement",
+    "subtitle": "Assistant avancé de revue de code par IA qui détecte les problèmes, suggère des améliorations et aide votre équipe à maintenir des normes de qualité de code élevées.",
+    "startFreeReview": "Démarrer une Revue Gratuite",
+    "viewDemo": "Voir la Démo"
+  },
+  "stats": {
+    "reviewsCompleted": "Revues Complétées",
+    "issuesDetected": "Problèmes Détectés",
+    "timeSaved": "Temps Économisé"
+  },
+  "features": {
+    "title": "Analyse Complète du Code",
+    "security": {
+      "title": "Analyse de Sécurité",
+      "description": "Détectez automatiquement les vulnérabilités, les risques d'injection et les anti-patterns de sécurité."
+    },
+    "quality": {
+      "title": "Qualité du Code",
+      "description": "Analysez la lisibilité, la maintenabilité et le respect des meilleures pratiques."
+    },
+    "performance": {
+      "title": "Performance",
+      "description": "Identifiez les goulots d'étranglement, les fuites mémoire et les opportunités d'optimisation."
+    },
+    "architecture": {
+      "title": "Revue d'Architecture",
+      "description": "Évaluez les modèles de conception, le couplage et la structure globale du code."
+    },
+    "testing": {
+      "title": "Couverture des Tests",
+      "description": "Suggérez les tests manquants et identifiez les chemins critiques non testés."
+    },
+    "fixes": {
+      "title": "Corrections Rapides",
+      "description": "Obtenez des correctifs générés par IA et des suggestions pour résoudre les problèmes instantanément."
+    }
+  },
+  "cta": {
+    "title": "Prêt à Améliorer la Qualité de Votre Code ?",
+    "subtitle": "Démarrez votre première revue en quelques secondes. Aucune carte de crédit requise.",
+    "button": "Démarrer une Revue Gratuite"
+  },
+  "footer": {
+    "copyright": "© 2024 Lintora. Conçu avec ❤️ pour les développeurs."
+  }
+}

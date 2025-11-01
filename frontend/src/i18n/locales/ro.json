@@ -1,0 +1,56 @@
+{
+  "header": {
+    "title": "Lintora",
+    "features": "Funcționalități",
+    "pricing": "Prețuri",
+    "startReview": "Începe Revizia"
+  },
+  "hero": {
+    "badge": "Analiză de Cod Bazată pe AI",
+    "title": "Livrează Cod Mai Bun,",
+    "titleLine2": "Revizuiește Mai Rapid",
+    "subtitle": "Asistent avansat de revizuire a codului cu AI care detectează probleme, sugerează îmbunătățiri și ajută echipa ta să mențină standarde înalte de calitate a codului.",
+    "startFreeReview": "Începe Revizie Gratuită",
+    "viewDemo": "Vizualizează Demo"
+  },
+  "stats": {
+    "reviewsCompleted": "Revizii Completate",
+    "issuesDetected": "Probleme Detectate",
+    "timeSaved": "Timp Economisit"
+  },
+  "features": {
+    "title": "Analiză Comprehensivă a Codului",
+    "security": {
+      "title": "Analiză de Securitate",
+      "description": "Detectează automat vulnerabilități, riscuri de injecție și anti-pattern-uri de securitate."
+    },
+    "quality": {
+      "title": "Calitatea Codului",
+      "description": "Analizează lizibilitatea, mentenabilitatea și aderența la cele mai bune practici."
+    },
+    "performance": {
+      "title": "Performanță",
+      "description": "Identifică blocaje, scurgeri de memorie și oportunități de optimizare."
+    },
+    "architecture": {
+      "title": "Revizie Arhitecturală",
+      "description": "Evaluează pattern-urile de design, cuplarea și structura generală a codului."
+    },
+    "testing": {
+      "title": "Acoperire cu Teste",
+      "description": "Sugerează teste lipsă și identifică căi critice netestate."
+    },
+    "fixes": {
+      "title": "Remedieri Rapide",
+      "description": "Primește patch-uri generate de AI și sugestii pentru a remedia problemele instant."
+    }
+  },
+  "cta": {
+    "title": "Gata să Îmbunătățești Calitatea Codului?",
+    "subtitle": "Începe prima revizie în câteva secunde. Nu este nevoie de card de credit.",
+    "button": "Începe Revizie Gratuită"
+  },
+  "footer": {
+    "copyright": "© 2024 Lintora. Creat cu ❤️ pentru dezvoltatori."
+  }
+}

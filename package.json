@@ -1,0 +1,33 @@
+{
+  "name": "lintora",
+  "version": "1.0.0",
+  "description": "AI-Powered Code Review Assistant with Local LLM",
+  "scripts": {
+    "install-hooks": "node scripts/install-hooks.js",
+    "uninstall-hooks": "node scripts/install-hooks.js uninstall",
+    "review-staged": "node scripts/pre-commit-review.js",
+    "postinstall": "echo '\n✨ Run \"npm run install-hooks\" to enable pre-commit reviews\n'",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "keywords": [
+    "code-review",
+    "ai",
+    "llm",
+    "ollama",
+    "static-analysis",
+    "linter",
+    "pre-commit",
+    "git-hooks"
+  ],
+  "author": "Team Lintora",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+

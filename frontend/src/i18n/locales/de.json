@@ -1,0 +1,56 @@
+{
+  "header": {
+    "title": "Lintora",
+    "features": "Funktionen",
+    "pricing": "Preise",
+    "startReview": "Review Starten"
+  },
+  "hero": {
+    "badge": "KI-gestützte Code-Analyse",
+    "title": "Besseren Code Liefern,",
+    "titleLine2": "Schneller Reviewen",
+    "subtitle": "Fortschrittlicher KI-Code-Review-Assistent, der Probleme erkennt, Verbesserungen vorschlägt und Ihrem Team hilft, hohe Code-Qualitätsstandards aufrechtzuerhalten.",
+    "startFreeReview": "Kostenloses Review Starten",
+    "viewDemo": "Demo Ansehen"
+  },
+  "stats": {
+    "reviewsCompleted": "Abgeschlossene Reviews",
+    "issuesDetected": "Erkannte Probleme",
+    "timeSaved": "Eingesparte Zeit"
+  },
+  "features": {
+    "title": "Umfassende Code-Analyse",
+    "security": {
+      "title": "Sicherheitsanalyse",
+      "description": "Erkennen Sie automatisch Schwachstellen, Injection-Risiken und Sicherheits-Anti-Patterns."
+    },
+    "quality": {
+      "title": "Code-Qualität",
+      "description": "Analysieren Sie Lesbarkeit, Wartbarkeit und Einhaltung von Best Practices."
+    },
+    "performance": {
+      "title": "Leistung",
+      "description": "Identifizieren Sie Engpässe, Speicherlecks und Optimierungsmöglichkeiten."
+    },
+    "architecture": {
+      "title": "Architektur-Review",
+      "description": "Bewerten Sie Designmuster, Kopplung und die Gesamtstruktur des Codes."
+    },
+    "testing": {
+      "title": "Testabdeckung",
+      "description": "Schlagen Sie fehlende Tests vor und identifizieren Sie ungetestete kritische Pfade."
+    },
+    "fixes": {
+      "title": "Schnelle Fixes",
+      "description": "Erhalten Sie KI-generierte Patches und Vorschläge zur sofortigen Behebung von Problemen."
+    }
+  },
+  "cta": {
+    "title": "Bereit, Ihre Code-Qualität zu Verbessern?",
+    "subtitle": "Starten Sie Ihr erstes Review in Sekunden. Keine Kreditkarte erforderlich.",
+    "button": "Kostenloses Review Starten"
+  },
+  "footer": {
+    "copyright": "© 2024 Lintora. Mit ❤️ für Entwickler erstellt."
+  }
+}
