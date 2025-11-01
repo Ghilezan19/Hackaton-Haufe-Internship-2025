@@ -1,0 +1,167 @@
+{
+  "name": "lintora",
+  "displayName": "Lintora - AI Code Review",
+  "description": "AI-powered code review with local LLM. Get instant feedback on security, quality, and performance.",
+  "version": "1.0.0",
+  "publisher": "lintora",
+  "icon": "icon.svg",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Linters",
+    "Programming Languages",
+    "Other"
+  ],
+  "keywords": [
+    "code review",
+    "ai",
+    "linter",
+    "security",
+    "quality",
+    "ollama",
+    "llm"
+  ],
+  "activationEvents": [
+    "onCommand:lintora.reviewFile",
+    "onCommand:lintora.reviewSelection",
+    "onCommand:lintora.reviewWorkspace",
+    "onCommand:lintora.fixCode"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "lintora.reviewFile",
+        "title": "Lintora: Review Current File",
+        "icon": "$(search)"
+      },
+      {
+        "command": "lintora.reviewSelection",
+        "title": "Lintora: Review Selected Code",
+        "icon": "$(search-view-icon)"
+      },
+      {
+        "command": "lintora.reviewWorkspace",
+        "title": "Lintora: Review All Files",
+        "icon": "$(folder)"
+      },
+      {
+        "command": "lintora.fixCode",
+        "title": "Lintora: Fix Code Issues",
+        "icon": "$(wand)"
+      },
+      {
+        "command": "lintora.configure",
+        "title": "Lintora: Configure Settings",
+        "icon": "$(gear)"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "lintora.reviewSelection",
+          "group": "lintora@1",
+          "when": "editorHasSelection"
+        },
+        {
+          "command": "lintora.reviewFile",
+          "group": "lintora@2"
+        },
+        {
+          "command": "lintora.fixCode",
+          "group": "lintora@3"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "lintora.reviewFile",
+          "group": "lintora@1"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Lintora",
+      "properties": {
+        "lintora.apiUrl": {
+          "type": "string",
+          "default": "http://localhost:3000/api",
+          "description": "Lintora backend API URL"
+        },
+        "lintora.authToken": {
+          "type": "string",
+          "default": "",
+          "description": "Authentication token (JWT)"
+        },
+        "lintora.analysisTypes": {
+          "type": "array",
+          "default": ["security", "quality", "performance"],
+          "description": "Types of analysis to perform",
+          "items": {
+            "type": "string",
+            "enum": ["security", "quality", "performance", "architecture", "testing", "documentation"]
+          }
+        },
+        "lintora.autoReview": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically review files on save"
+        },
+        "lintora.showInlineDecorations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show inline decorations for issues"
+        },
+        "lintora.severity": {
+          "type": "string",
+          "default": "high",
+          "enum": ["critical", "high", "medium", "low", "info"],
+          "description": "Minimum severity level to show"
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lintora",
+          "title": "Lintora",
+          "icon": "$(search-view-icon)"
+        }
+      ]
+    },
+    "views": {
+      "lintora": [
+        {
+          "id": "lintoraFindings",
+          "name": "Code Review Findings"
+        },
+        {
+          "id": "lintoraStats",
+          "name": "Statistics"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.80.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ghilezan19/test.git"
+  },
+  "license": "MIT"
+}
+
