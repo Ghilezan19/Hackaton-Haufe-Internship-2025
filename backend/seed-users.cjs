@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+
+
+
 const userSchema = new mongoose.Schema({
   email: String,
   password: String,
