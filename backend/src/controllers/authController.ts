@@ -5,13 +5,17 @@ import { AuthRequest } from '../middleware/auth.js';
 
 export async function signup(req: Request, res: Response): Promise<void> {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, role, schoolName, subject, grade } = req.body;
 
     // Validation
     if (!email || !password || !name) {
       res.status(400).json({ error: 'Email, password, and name are required' });
       return;
     }
+
+    // Validate role
+    const validRoles = ['user', 'teacher', 'student', 'parent'];
+    const userRole = role && validRoles.includes(role) ? role : 'user';
 
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -20,21 +24,45 @@ export async function signup(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    // Create user with free trial (10 reviews)
-    const user = await User.create({
+    // Base user data
+    const userData: any = {
       email,
       password,
       name,
-      role: 'user',
+      role: userRole,
       subscription: {
         plan: 'free',
         status: 'active',
-        reviewsLeft: 10,
+        reviewsLeft: userRole === 'student' ? 100 : 10,
         reviewsUsed: 0,
-        totalReviewsAllowed: 10,
+        totalReviewsAllowed: userRole === 'student' ? 100 : 10,
         startDate: new Date(),
       },
-    });
+    };
+
+    // Add role-specific profiles
+    if (userRole === 'teacher') {
+      userData.teacherProfile = {
+        schoolName: schoolName || 'School',
+        subject: subject || 'Computer Science',
+        classroomIds: [],
+      };
+    } else if (userRole === 'student') {
+      // Generate unique student code for parent linking
+      const studentCode = `STU-${Date.now()}-${Math.random().toString(36).substring(7).toUpperCase()}`;
+      userData.studentProfile = {
+        grade: grade || 9,
+        studentCode,
+      };
+    } else if (userRole === 'parent') {
+      userData.parentProfile = {
+        studentIds: [],
+        notifications: true,
+      };
+    }
+
+    // Create user
+    const user = await User.create(userData);
 
     // Generate token
     const token = generateToken({
@@ -115,16 +143,25 @@ export async function getProfile(req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    res.json({
-      user: {
-        id: req.user._id,
-        email: req.user.email,
-        name: req.user.name,
-        role: req.user.role,
-        subscription: req.user.subscription,
-        createdAt: req.user.createdAt,
-      },
-    });
+    const userResponse: any = {
+      id: req.user._id,
+      email: req.user.email,
+      name: req.user.name,
+      role: req.user.role,
+      subscription: req.user.subscription,
+      createdAt: req.user.createdAt,
+    };
+
+    // Add role-specific profiles
+    if (req.user.role === 'teacher' && req.user.teacherProfile) {
+      userResponse.teacherProfile = req.user.teacherProfile;
+    } else if (req.user.role === 'student' && req.user.studentProfile) {
+      userResponse.studentProfile = req.user.studentProfile;
+    } else if (req.user.role === 'parent' && req.user.parentProfile) {
+      userResponse.parentProfile = req.user.parentProfile;
+    }
+
+    res.json({ user: userResponse });
   } catch (error) {
     console.error('Get profile error:', error);
     res.status(500).json({ error: 'Failed to fetch profile' });
@@ -170,6 +207,72 @@ export async function upgradePlan(req: AuthRequest, res: Response): Promise<void
   } catch (error) {
     console.error('Upgrade plan error:', error);
     res.status(500).json({ error: 'Failed to upgrade plan' });
+  }
+}
+
+/**
+ * Link parent to student using student code
+ */
+export async function linkParentToStudent(req: AuthRequest, res: Response): Promise<void> {
+  try {
+    if (!req.user || req.user.role !== 'parent') {
+      res.status(403).json({ error: 'Parent role required' });
+      return;
+    }
+
+    const { studentCode } = req.body;
+
+    if (!studentCode) {
+      res.status(400).json({ error: 'Student code is required' });
+      return;
+    }
+
+    // Find student by code
+    const student = await User.findOne({ 
+      'studentProfile.studentCode': studentCode,
+      role: 'student'
+    });
+
+    if (!student) {
+      res.status(404).json({ error: 'Invalid student code' });
+      return;
+    }
+
+    // Check if already linked
+    const alreadyLinked = req.user.parentProfile?.studentIds?.some(
+      id => id.toString() === student._id.toString()
+    );
+
+    if (alreadyLinked) {
+      res.status(400).json({ error: 'Student already linked to your account' });
+      return;
+    }
+
+    // Link parent to student
+    if (!req.user.parentProfile) {
+      req.user.parentProfile = { studentIds: [], notifications: true };
+    }
+    req.user.parentProfile.studentIds.push(student._id);
+    await req.user.save();
+
+    // Link student to parent
+    if (!student.studentProfile) {
+      student.studentProfile = { grade: 9, studentCode: '' };
+    }
+    student.studentProfile.parentId = req.user._id;
+    await student.save();
+
+    res.json({
+      message: 'Successfully linked to student',
+      student: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+      },
+    });
+  } catch (error) {
+    console.error('Link parent error:', error);
+    res.status(500).json({ error: 'Failed to link parent to student' });
   }
 }
 

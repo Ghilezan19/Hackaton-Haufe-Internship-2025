@@ -12,10 +12,10 @@ export const Footer = () => {
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
               <Code2 className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">Lintora</span>
+              <span className="text-xl font-bold">ScoalaDeAI</span>
             </Link>
             <p className="text-sm text-muted-foreground">
-              AI-powered code review assistant using local LLM for complete privacy and security.
+              Platformă educațională pentru învățarea programării cu mentoring AI, exerciții interactive și suport personalizat.
             </p>
             <div className="flex gap-3">
               <a
@@ -43,7 +43,7 @@ export const Footer = () => {
                 <Linkedin className="h-5 w-5" />
               </a>
               <a
-                href="mailto:support@lintora.com"
+                href="mailto:support@scoaladeai.ro"
                 className="text-muted-foreground hover:text-primary transition-colors"
               >
                 <Mail className="h-5 w-5" />
@@ -114,10 +114,10 @@ export const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:careers@lintora.com"
+                  href="mailto:careers@scoaladeai.ro"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Careers
+                  Cariere
                 </a>
               </li>
               <li>
@@ -155,18 +155,18 @@ export const Footer = () => {
               </li>
               <li>
                 <a
-                  href="mailto:security@lintora.com"
+                  href="mailto:security@scoaladeai.ro"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Security
+                  Securitate
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:compliance@lintora.com"
+                  href="mailto:compliance@scoaladeai.ro"
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  Compliance
+                  Conformitate
                 </a>
               </li>
             </ul>
@@ -175,12 +175,12 @@ export const Footer = () => {
 
         <div className="border-t border-border/40 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground text-center md:text-left">
-            © {currentYear} Lintora. Built with ❤️ for developers. All rights reserved.
+            © {currentYear} ScoalaDeAI. Construit cu ❤️ pentru elevi și profesori. Toate drepturile rezervate.
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <span>🔒 100% Local AI</span>
-            <span>🚀 Privacy First</span>
-            <span>⚡ Lightning Fast</span>
+            <span>🤖 AI Mentor</span>
+            <span>📚 Învățare Interactivă</span>
+            <span>⚡ Progres Rapid</span>
           </div>
         </div>
       </div>

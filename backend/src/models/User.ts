@@ -5,7 +5,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   name: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'teacher' | 'student' | 'parent';
   subscription: {
     plan: 'free' | 'pro' | 'enterprise';
     status: 'active' | 'cancelled' | 'expired';
@@ -14,6 +14,24 @@ export interface IUser extends Document {
     totalReviewsAllowed: number;
     startDate: Date;
     endDate?: Date;
+  };
+  // Teacher profile
+  teacherProfile?: {
+    schoolName: string;
+    subject: string;
+    classroomIds: mongoose.Types.ObjectId[];
+  };
+  // Student profile
+  studentProfile?: {
+    classroomId?: mongoose.Types.ObjectId;
+    parentId?: mongoose.Types.ObjectId;
+    grade: number;
+    studentCode: string; // Unique code for parent linking
+  };
+  // Parent profile
+  parentProfile?: {
+    studentIds: mongoose.Types.ObjectId[];
+    notifications: boolean;
   };
   createdAt: Date;
   updatedAt: Date;
@@ -41,8 +59,23 @@ const userSchema = new Schema<IUser>(
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'admin', 'teacher', 'student', 'parent'],
       default: 'user',
+    },
+    teacherProfile: {
+      schoolName: { type: String },
+      subject: { type: String },
+      classroomIds: [{ type: Schema.Types.ObjectId, ref: 'Classroom' }],
+    },
+    studentProfile: {
+      classroomId: { type: Schema.Types.ObjectId, ref: 'Classroom' },
+      parentId: { type: Schema.Types.ObjectId, ref: 'User' },
+      grade: { type: Number },
+      studentCode: { type: String, unique: true, sparse: true },
+    },
+    parentProfile: {
+      studentIds: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+      notifications: { type: Boolean, default: true },
     },
     subscription: {
       plan: {

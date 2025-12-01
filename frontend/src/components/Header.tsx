@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { Code2, LogOut, User } from "lucide-react";
+import { Code2, LogOut, User, Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { api, getAuthToken } from "@/lib/api";
 import { useEffect, useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,6 +35,7 @@ export const Header = () => {
   const location = useLocation();
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const token = getAuthToken();
@@ -65,6 +67,77 @@ export const Header = () => {
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
     >
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Mobile Menu Button */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild className="md:hidden">
+            <Button variant="ghost" size="icon">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+            <SheetHeader>
+              <SheetTitle className="flex items-center gap-2">
+                <Code2 className="h-6 w-6 text-primary" />
+                <span className="text-xl font-bold">{t("header.title")}</span>
+              </SheetTitle>
+            </SheetHeader>
+            <nav className="flex flex-col gap-4 mt-8">
+              {/* Mobile Navigation Content - same as desktop but vertical */}
+              {isLoggedIn && user ? (
+                <>
+                  {user.role === 'teacher' && (
+                    <>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/dashboard/teacher'); setMobileMenuOpen(false); }}>Dashboard</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/ai-mentor'); setMobileMenuOpen(false); }}>🤖 AI Mentor</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/review'); setMobileMenuOpen(false); }}>Code Review</Button>
+                    </>
+                  )}
+                  {user.role === 'student' && (
+                    <>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/dashboard/student'); setMobileMenuOpen(false); }}>Dashboard</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/ai-mentor'); setMobileMenuOpen(false); }}>🤖 AI Mentor</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/review'); setMobileMenuOpen(false); }}>Code Review</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/exercises'); setMobileMenuOpen(false); }}>Exercises</Button>
+                    </>
+                  )}
+                  {user.role === 'parent' && (
+                    <Button variant="ghost" className="justify-start" onClick={() => { navigate('/dashboard/parent'); setMobileMenuOpen(false); }}>Dashboard</Button>
+                  )}
+                  {(user.role === 'user' || user.role === 'admin') && (
+                    <>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/'); setMobileMenuOpen(false); }}>{t("header.home")}</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/review'); setMobileMenuOpen(false); }}>{t("header.review")}</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/exercises'); setMobileMenuOpen(false); }}>Exercises</Button>
+                      <Button variant="ghost" className="justify-start" onClick={() => { navigate('/pricing'); setMobileMenuOpen(false); }}>Pricing</Button>
+                    </>
+                  )}
+                  <div className="border-t pt-4 mt-4">
+                    <div className="px-2 mb-4">
+                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Plan: {user.subscription.plan}</p>
+                    </div>
+                    <Button variant="destructive" className="w-full justify-start" onClick={() => { handleLogout(); setMobileMenuOpen(false); }}>
+                      <LogOut className="mr-2 h-4 w-4" /> Logout
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" className="justify-start" onClick={() => { navigate('/'); setMobileMenuOpen(false); }}>{t("header.home")}</Button>
+                  <Button variant="ghost" className="justify-start" onClick={() => { navigate('/about'); setMobileMenuOpen(false); }}>About</Button>
+                  <Button variant="ghost" className="justify-start" onClick={() => { navigate('/pricing'); setMobileMenuOpen(false); }}>Pricing</Button>
+                  <div className="border-t pt-4 mt-4">
+                    <Button variant="ghost" className="w-full justify-start" onClick={() => { navigate('/login'); setMobileMenuOpen(false); }}>Login</Button>
+                    <Button variant="default" className="w-full justify-start gradient-primary mt-2" onClick={() => { navigate('/signup'); setMobileMenuOpen(false); }}>Sign Up Free</Button>
+                  </div>
+                </>
+              )}
+            </nav>
+          </SheetContent>
+        </Sheet>
+
+        {/* Logo */}
         <motion.div
           className="flex items-center gap-2 cursor-pointer"
           whileHover={{ scale: 1.02 }}
@@ -74,57 +147,191 @@ export const Header = () => {
           <Code2 className="h-6 w-6 text-primary" />
           <span className="text-xl font-bold">{t("header.title")}</span>
         </motion.div>
-        <div className="flex items-center gap-4">
-          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="ghost" 
-              className="relative group"
-              onClick={() => navigate('/')}
-            >
-              {t("header.home")}
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="ghost" 
-              className="relative group"
-              onClick={() => navigate('/review')}
-            >
-              {t("header.review")}
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="ghost" 
-              className="relative group"
-              onClick={() => navigate('/exercises')}
-            >
-              Exercises
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="ghost" 
-              className="relative group"
-              onClick={() => navigate('/pricing')}
-            >
-              Pricing
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
-            </Button>
-          </motion.div>
-          <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
-            <Button 
-              variant="ghost" 
-              className="relative group"
-              onClick={() => navigate('/about')}
-            >
-              About
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
-            </Button>
-          </motion.div>
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-4">
+          {/* Navigation based on user role */}
+          {isLoggedIn && user ? (
+            <>
+              {/* Teacher Navigation */}
+              {user.role === 'teacher' && (
+                <>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/dashboard/teacher')}
+                    >
+                      Dashboard
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/ai-mentor')}
+                    >
+                      🤖 AI Mentor
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/review')}
+                    >
+                      Code Review
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+
+              {/* Student Navigation */}
+              {user.role === 'student' && (
+                <>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/dashboard/student')}
+                    >
+                      Dashboard
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/ai-mentor')}
+                    >
+                      🤖 AI Mentor
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/review')}
+                    >
+                      Code Review
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/exercises')}
+                    >
+                      Exercises
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+
+              {/* Parent Navigation */}
+              {user.role === 'parent' && (
+                <>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/dashboard/parent')}
+                    >
+                      Dashboard
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+
+              {/* Default/Admin Navigation */}
+              {(user.role === 'user' || user.role === 'admin') && (
+                <>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/')}
+                    >
+                      {t("header.home")}
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/review')}
+                    >
+                      {t("header.review")}
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/exercises')}
+                    >
+                      Exercises
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                  <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                    <Button 
+                      variant="ghost" 
+                      className="relative group"
+                      onClick={() => navigate('/pricing')}
+                    >
+                      Pricing
+                      <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+            </>
+          ) : (
+            /* Guest Navigation */
+            <>
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  variant="ghost" 
+                  className="relative group"
+                  onClick={() => navigate('/')}
+                >
+                  {t("header.home")}
+                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  variant="ghost" 
+                  className="relative group"
+                  onClick={() => navigate('/about')}
+                >
+                  About
+                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}>
+                <Button 
+                  variant="ghost" 
+                  className="relative group"
+                  onClick={() => navigate('/pricing')}
+                >
+                  Pricing
+                  <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-3/4 group-hover:left-1/8" />
+                </Button>
+              </motion.div>
+            </>
+          )}
+          
           <ThemeToggle />
           <LanguageSwitcher />
           

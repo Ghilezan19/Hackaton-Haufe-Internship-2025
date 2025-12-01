@@ -1,6 +1,6 @@
 {
   "header": {
-    "title": "Lintora",
+    "title": "ScoalaDeAI",
     "features": "Fonctionnalités",
     "pricing": "Tarifs",
     "startReview": "Démarrer la Revue"
@@ -51,6 +51,6 @@
     "button": "Démarrer une Revue Gratuite"
   },
   "footer": {
-    "copyright": "© 2024 Lintora. Conçu avec ❤️ pour les développeurs."
+    "copyright": "© 2024 ScoalaDeAI. Conçu avec ❤️ pour les étudiants et enseignants."
   }
 }

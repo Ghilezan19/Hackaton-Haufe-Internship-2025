@@ -1,3 +1,21 @@
+import type {
+  UserRole,
+  Classroom,
+  CreateClassroomRequest,
+  JoinClassroomRequest,
+  Student,
+  ReviewWithDetails,
+  ErrorStatistics,
+  AISuggestion,
+  GenerateAISuggestionsRequest,
+  ParentSummary,
+  SimplifiedReview,
+  TeacherDashboard,
+  ParentDashboard,
+  Child,
+  LinkParentRequest,
+} from '../types/educational';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 // Auth token management
@@ -72,10 +90,10 @@ export interface CodeReviewResponse {
 export interface HealthResponse {
   status: string;
   timestamp: string;
-  ollama: {
+  ai: {
     connected: boolean;
     model: string;
-    host: string;
+    provider: string;
     error?: string;
   };
 }
@@ -119,11 +137,23 @@ export const api = {
   },
 
   // Auth endpoints
-  async signup(email: string, password: string, name: string): Promise<AuthResponse> {
+  async signup(
+    email: string, 
+    password: string, 
+    name: string,
+    role?: UserRole,
+    extra?: { schoolName?: string; subject?: string; grade?: number }
+  ): Promise<AuthResponse> {
+    const body: Record<string, unknown> = { email, password, name };
+    if (role) body.role = role;
+    if (extra?.schoolName) body.schoolName = extra.schoolName;
+    if (extra?.subject) body.subject = extra.subject;
+    if (extra?.grade) body.grade = extra.grade;
+
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password, name }),
+      body: JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -338,6 +368,301 @@ export const api = {
         throw new Error('Please login to continue');
       }
       throw new Error(error.message || error.error || 'Exercise verification failed');
+    }
+
+    return response.json();
+  },
+
+  // ========== EDUCATIONAL ENDPOINTS ==========
+
+  // Parent linking
+  async linkParent(request: LinkParentRequest): Promise<{ message: string; student: any }> {
+    const response = await fetch(`${API_BASE_URL}/auth/link-parent`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to link parent');
+    }
+
+    return response.json();
+  },
+
+  // ========== CLASSROOM ENDPOINTS ==========
+
+  async createClassroom(request: CreateClassroomRequest): Promise<{ message: string; classroom: Classroom }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create classroom');
+    }
+
+    return response.json();
+  },
+
+  async getTeacherClassrooms(): Promise<{ classrooms: Classroom[] }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms/my-classrooms`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch classrooms');
+    }
+
+    return response.json();
+  },
+
+  async getClassroomDetails(classroomId: string): Promise<{ classroom: Classroom }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms/${classroomId}`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch classroom details');
+    }
+
+    return response.json();
+  },
+
+  async joinClassroom(request: JoinClassroomRequest): Promise<{ message: string; classroom: Classroom }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms/join`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to join classroom');
+    }
+
+    return response.json();
+  },
+
+  async removeStudentFromClassroom(classroomId: string, studentId: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms/${classroomId}/students/${studentId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to remove student');
+    }
+
+    return response.json();
+  },
+
+  async deleteClassroom(classroomId: string): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/classrooms/${classroomId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete classroom');
+    }
+
+    return response.json();
+  },
+
+  // ========== TEACHER ENDPOINTS ==========
+
+  async getTeacherDashboard(): Promise<TeacherDashboard> {
+    const response = await fetch(`${API_BASE_URL}/teacher/dashboard`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch dashboard');
+    }
+
+    return response.json();
+  },
+
+  async getTeacherStudents(): Promise<{ students: Student[]; totalStudents: number }> {
+    const response = await fetch(`${API_BASE_URL}/teacher/students`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch students');
+    }
+
+    return response.json();
+  },
+
+  async getStudentReviews(studentId: string, limit = 20, skip = 0): Promise<{
+    student: { id: string; name: string; email: string };
+    reviews: ReviewWithDetails[];
+    totalReviews: number;
+    hasMore: boolean;
+  }> {
+    const response = await fetch(
+      `${API_BASE_URL}/teacher/students/${studentId}/reviews?limit=${limit}&skip=${skip}`,
+      { headers: getAuthHeaders() }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch reviews');
+    }
+
+    return response.json();
+  },
+
+  async getStudentErrors(studentId: string, timeframe = 30): Promise<{
+    student: { id: string; name: string };
+    timeframe: { start: string; end: string; days: number };
+    statistics: ErrorStatistics;
+    recentErrors: any[];
+  }> {
+    const response = await fetch(
+      `${API_BASE_URL}/teacher/students/${studentId}/errors?timeframe=${timeframe}`,
+      { headers: getAuthHeaders() }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch errors');
+    }
+
+    return response.json();
+  },
+
+  async generateAISuggestions(
+    studentId: string,
+    request: GenerateAISuggestionsRequest = {}
+  ): Promise<{
+    student: { id: string; name: string };
+    aiSuggestion: AISuggestion;
+    reviewsAnalyzed: number;
+  }> {
+    const response = await fetch(`${API_BASE_URL}/teacher/students/${studentId}/ai-suggestions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders(),
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to generate AI suggestions');
+    }
+
+    return response.json();
+  },
+
+  async getStudentAISuggestions(studentId: string): Promise<{ suggestions: AISuggestion[] }> {
+    const response = await fetch(`${API_BASE_URL}/teacher/students/${studentId}/ai-suggestions`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch AI suggestions');
+    }
+
+    return response.json();
+  },
+
+  // ========== PARENT ENDPOINTS ==========
+
+  async getParentDashboard(): Promise<ParentDashboard> {
+    const response = await fetch(`${API_BASE_URL}/parent/dashboard`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch dashboard');
+    }
+
+    return response.json();
+  },
+
+  async getChildren(): Promise<{ children: Child[]; totalChildren: number }> {
+    const response = await fetch(`${API_BASE_URL}/parent/children`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch children');
+    }
+
+    return response.json();
+  },
+
+  async getChildReviews(childId: string, limit = 10, skip = 0): Promise<{
+    child: { id: string; name: string };
+    reviews: SimplifiedReview[];
+    totalReviews: number;
+    hasMore: boolean;
+  }> {
+    const response = await fetch(
+      `${API_BASE_URL}/parent/children/${childId}/reviews?limit=${limit}&skip=${skip}`,
+      { headers: getAuthHeaders() }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch reviews');
+    }
+
+    return response.json();
+  },
+
+  async getChildProgressSummary(childId: string, timeframe = 30): Promise<{
+    child: { id: string; name: string };
+    summary: ParentSummary;
+    reviewsAnalyzed: number;
+  }> {
+    const response = await fetch(
+      `${API_BASE_URL}/parent/children/${childId}/summary?timeframe=${timeframe}`,
+      { headers: getAuthHeaders() }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch summary');
+    }
+
+    return response.json();
+  },
+
+  async getChildAISummaries(childId: string): Promise<{ summaries: ParentSummary[] }> {
+    const response = await fetch(`${API_BASE_URL}/parent/children/${childId}/ai-summaries`, {
+      headers: getAuthHeaders(),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to fetch summaries');
     }
 
     return response.json();

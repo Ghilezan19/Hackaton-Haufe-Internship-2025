@@ -25,6 +25,22 @@ export async function reviewCodeHandler(req: AuthRequest, res: Response) {
     
     // Track usage if user is authenticated
     if (req.user) {
+      // Get classroom ID if student
+      let classroomId;
+      if (req.user.role === 'student' && req.user.studentProfile?.classroomId) {
+        classroomId = req.user.studentProfile.classroomId;
+      }
+
+      // Save findings details for educational features
+      const findingsDetails = result.findings.map(f => ({
+        type: f.type,
+        severity: f.severity,
+        title: f.title,
+        description: f.description,
+        lineStart: f.lineStart,
+        lineEnd: f.lineEnd,
+      }));
+
       await trackReviewUsage(req.user._id.toString(), {
         language: request.language || 'unknown',
         filename: request.filename,
@@ -33,6 +49,8 @@ export async function reviewCodeHandler(req: AuthRequest, res: Response) {
         overallScore: result.summary.overallScore,
         tokensUsed: result.metrics.tokensUsed,
         analysisTime: result.metrics.analysisTime,
+        classroomId,
+        findingsDetails,
       });
 
       // Decrement reviews left (unless admin or unlimited)

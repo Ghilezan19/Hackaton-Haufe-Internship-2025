@@ -1,10 +1,10 @@
 # Lintora Backend
 
-AI-powered code review backend using **local LLM (Ollama)** for privacy and performance.
+AI-powered code review backend using **OpenAI GPT** for advanced code analysis.
 
 ## Features
 
-✅ **Local LLM Integration** (Ollama - CodeLlama)
+✅ **OpenAI GPT Integration** (GPT-4o-mini by default)
 ✅ **Modular Code Analysis** (Security, Quality, Performance, Architecture, Testing, Documentation)
 ✅ **Incremental Review** (analyze only changed code)
 ✅ **Auto-Fix Suggestions** (AI-generated code fixes)
@@ -15,25 +15,7 @@ AI-powered code review backend using **local LLM (Ollama)** for privacy and perf
 ## Prerequisites
 
 1. **Node.js** 18+ and npm
-2. **Ollama** installed and running
-
-### Install Ollama
-
-```bash
-# macOS/Linux
-curl -fsSL https://ollama.ai/install.sh | sh
-
-# Windows
-# Download from https://ollama.ai/download
-```
-
-### Pull CodeLlama Model
-
-```bash
-ollama pull codellama:13b
-# or for faster but less accurate:
-# ollama pull codellama:7b
-```
+2. **OpenAI API Key**
 
 ## Setup
 
@@ -48,14 +30,22 @@ Create `.env` file:
 cp .env.example .env
 ```
 
+Add your OpenAI API key to `.env`:
+
+```bash
+OPENAI_API_KEY=your-api-key-here
+OPENAI_MODEL=gpt-4o-mini  # or gpt-4, gpt-3.5-turbo, etc.
+```
+
 Edit `.env`:
 
 ```env
 PORT=3000
-OLLAMA_HOST=http://localhost:11434
-OLLAMA_MODEL=codellama:13b
+OPENAI_API_KEY=REDACTED_KEY
+OPENAI_MODEL=gpt-4o-mini
 CORS_ORIGIN=http://localhost:8080
 MAX_FILE_SIZE=10485760
+MONGODB_URI=mongodb://localhost:27017/lintora
 ```
 
 ## Development
@@ -74,7 +64,7 @@ The server will run on `http://localhost:3000`
 GET /api/health
 ```
 
-Returns Ollama connection status and model info.
+Returns OpenAI connection status and model info.
 
 ### Code Review (Text)
 

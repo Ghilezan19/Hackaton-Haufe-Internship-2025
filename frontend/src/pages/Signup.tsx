@@ -5,16 +5,22 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import { Code2, Loader2, CheckCircle2 } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Code2, Loader2, CheckCircle2, GraduationCap, Users, BookOpen } from "lucide-react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import type { UserRole } from "@/types/educational";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<UserRole>("student");
+  const [schoolName, setSchoolName] = useState("");
+  const [subject, setSubject] = useState("");
+  const [grade, setGrade] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -30,11 +36,38 @@ const Signup = () => {
       return;
     }
 
+    // Validate role-specific fields
+    if (role === "teacher" && (!schoolName || !subject)) {
+      toast.error("Please fill in school name and subject");
+      return;
+    }
+
+    if (role === "student" && !grade) {
+      toast.error("Please select your grade");
+      return;
+    }
+
     setIsLoading(true);
     try {
-      const response = await api.signup(email, password, name);
+      const extra = role === "teacher" 
+        ? { schoolName, subject }
+        : role === "student"
+        ? { grade: parseInt(grade) }
+        : undefined;
+
+      const response = await api.signup(email, password, name, role, extra);
       toast.success(`Account created! Welcome, ${response.user.name}!`);
-      navigate("/review");
+      
+      // Redirect based on role
+      if (role === "teacher") {
+        navigate("/dashboard/teacher");
+      } else if (role === "parent") {
+        navigate("/dashboard/parent");
+      } else if (role === "student") {
+        navigate("/dashboard/student");
+      } else {
+        navigate("/review");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Signup failed");
     } finally {
@@ -66,6 +99,33 @@ const Signup = () => {
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-3">
+              <Label>I am a...</Label>
+              <RadioGroup value={role} onValueChange={(value) => setRole(value as UserRole)}>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                  <RadioGroupItem value="student" id="student" />
+                  <Label htmlFor="student" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <GraduationCap className="h-4 w-4 text-primary" />
+                    <span>Student</span>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                  <RadioGroupItem value="teacher" id="teacher" />
+                  <Label htmlFor="teacher" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    <span>Teacher</span>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-accent cursor-pointer">
+                  <RadioGroupItem value="parent" id="parent" />
+                  <Label htmlFor="parent" className="flex items-center gap-2 cursor-pointer flex-1">
+                    <Users className="h-4 w-4 text-primary" />
+                    <span>Parent</span>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -103,6 +163,51 @@ const Signup = () => {
               />
               <p className="text-xs text-muted-foreground">Minimum 6 characters</p>
             </div>
+
+            {/* Teacher-specific fields */}
+            {role === "teacher" && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="schoolName">School Name</Label>
+                  <Input
+                    id="schoolName"
+                    type="text"
+                    placeholder="Lincoln High School"
+                    value={schoolName}
+                    onChange={(e) => setSchoolName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="subject">Subject</Label>
+                  <Input
+                    id="subject"
+                    type="text"
+                    placeholder="Computer Science"
+                    value={subject}
+                    onChange={(e) => setSubject(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Student-specific fields */}
+            {role === "student" && (
+              <div className="space-y-2">
+                <Label htmlFor="grade">Grade</Label>
+                <Input
+                  id="grade"
+                  type="number"
+                  placeholder="9"
+                  value={grade}
+                  onChange={(e) => setGrade(e.target.value)}
+                  min="1"
+                  max="12"
+                  required
+                />
+              </div>
+            )}
 
             <Button
               type="submit"

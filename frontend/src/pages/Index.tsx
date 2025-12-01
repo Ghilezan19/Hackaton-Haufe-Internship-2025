@@ -64,7 +64,7 @@ const Index = () => {
 
           {/* Staggered Headline */}
           <motion.h1
-            className="text-5xl md:text-6xl font-bold mb-6"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 px-4"
             variants={item}
           >
             <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
@@ -76,13 +76,13 @@ const Index = () => {
 
           <motion.p
             variants={item}
-            className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto"
+            className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto px-4"
           >
             {t("hero.subtitle")}
           </motion.p>
 
           {/* CTA Buttons */}
-          <motion.div variants={item} className="flex gap-4 justify-center">
+          <motion.div variants={item} className="flex flex-col sm:flex-row gap-4 justify-center px-4">
             <motion.div
               whileHover={{
                 scale: 1.03,
@@ -217,11 +217,11 @@ const Index = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <Card className="p-12 gradient-primary text-primary-foreground border-0 relative overflow-hidden">
+          <Card className="p-6 sm:p-8 md:p-12 gradient-primary text-primary-foreground border-0 relative overflow-hidden">
             <div className="absolute inset-0 animate-shimmer opacity-20" />
             <div className="relative">
-              <h2 className="text-3xl font-bold mb-4">{t("cta.title")}</h2>
-              <p className="text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-4">{t("cta.title")}</h2>
+              <p className="text-sm sm:text-base text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
                 {t("cta.subtitle")}
               </p>
               <motion.div

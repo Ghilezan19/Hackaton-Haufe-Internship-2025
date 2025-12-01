@@ -1,8 +1,8 @@
 import OpenAI from 'openai';
 
-// Using OLLAMA_ prefix but connecting to OpenAI behind the scenes
-const OPENAI_API_KEY = process.env.OLLAMA_API_KEY || process.env.OPENAI_API_KEY;
-const OPENAI_MODEL = process.env.OLLAMA_LLM_MODEL || process.env.OPENAI_MODEL || 'gpt-4o-mini';
+// OpenAI API configuration
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY';
+const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
 
 const openai = new OpenAI({
   apiKey: OPENAI_API_KEY,

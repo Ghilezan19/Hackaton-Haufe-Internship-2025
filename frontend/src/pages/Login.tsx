@@ -28,7 +28,18 @@ const Login = () => {
     try {
       const response = await api.login(email, password);
       toast.success(`Welcome back, ${response.user.name}!`);
-      navigate("/review");
+      
+      // Redirect based on role
+      const role = response.user.role;
+      if (role === "teacher") {
+        navigate("/dashboard/teacher");
+      } else if (role === "parent") {
+        navigate("/dashboard/parent");
+      } else if (role === "student") {
+        navigate("/dashboard/student");
+      } else {
+        navigate("/review");
+      }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Login failed");
     } finally {
